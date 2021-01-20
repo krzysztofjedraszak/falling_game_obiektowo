@@ -4,12 +4,14 @@ from pgzero.actor import Actor
 
 class Poziom_zycia(Actor):
     def __init__(self):
+        self.first=30
+        self.second=30
         self.zycia = []
         self.ilosc_zyc = 3
         self.blokada = False
 
         for i in range(self.ilosc_zyc):
-            self.zycia.append(Actor("heart",(30+i*53,28)))
+            self.zycia.append(Actor("heart",(self.first+i*53,self.second)))
 
     def zdejmij_blokade(self):
         self.blokada = False
@@ -30,17 +32,31 @@ class Poziom_zycia(Actor):
 
 
 class Gracz(Actor):
-    def __init__(self, x, y):
-        # super
+    def __init__(self):
+        self.first=400
+        self.second=484
+        super(Gracz, self).__init__("p1_stand",(self.first,self.second))
         self.klatka = 0
-        self.szybkosc = 0
+        self.szybkosc = 6
         self.punkty = 0
 
-    def draw(self):
-        pass
+    # def draw(self):
+    #     pass
 
     def update(self):
-        pass
+        for i in range(1, 10):
+            if self.klatka == 0:
+                self.image = "p1_walk01"
+            elif self.klatka == i:
+                self.image = f"p1_walk0{i}"
+            elif self.klatka == 9:
+                self.image = "p1_walk10"
+            elif self.klatka == 10:
+                self.image = "p1_walk11"
+
+        self.klatka += 1
+        if self.klatka == 11:
+            self.klatka = 0
 
 
 class Napisy():
@@ -65,16 +81,36 @@ class Tlo_Podloze(Actor):
 class Plansza():
     def __init__(self):
         self.zycia = Poziom_zycia()
-        self.gracz = Gracz(0, 0)
+        self.gracz = Gracz()
         self.przeszkody = Przeszkody()
         self.tlo_podloze = Tlo_Podloze(0, 0)
         self.napisy = Napisy()
+        self.stan_gry=1
 
     def draw(self):
         self.zycia.draw()
+        self.gracz.draw()
 
     def update(self):
-        pass
+        if self.stan_gry==0:
+            pass
+
+
+        if self.stan_gry==1:
+            if keyboard.right or keyboard.left:
+                if keyboard.RIGHT:
+                    self.gracz.left += self.gracz.szybkosc
+
+                if keyboard.LEFT:
+                    self.gracz.left -= self.gracz.szybkosc
+
+                if keyboard.SPACE and keyboard.LEFT:
+                    self.gracz.left -= 2 * self.gracz.szybkosc
+
+                if keyboard.SPACE and keyboard.RIGHT:
+                    self.gracz.left += 2 * self.gracz.szybkosc
+
+                self.gracz.update()
 
 
 class Fireball(Actor):
@@ -125,16 +161,12 @@ class Przeszkody():
 
 gra = Plansza()
 
-
 def draw():
     screen.clear()
-
     gra.draw()
-    pass
-
 
 def update():
-    pass
+    gra.update()
 
 
 pgzrun.go()
