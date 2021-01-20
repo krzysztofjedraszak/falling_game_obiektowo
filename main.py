@@ -61,11 +61,12 @@ class Gracz(Actor):
 
 class Napisy():
     def __init__(self):
-        self.start = ""
-        self.koniec = ""
+        self.start = "Wcisnij ENTER aby rozpoczac gre"
+        self.koniec = "Przegrales :( Koniec Gry\nWcisnij ENTER aby zagrac jeszcze raz"
 
-    def draw(self):
-        pass
+    def draw(self,arg):
+        screen.draw.text(arg, center=(screen.width / 2, screen.height / 2),
+                         color="orange", fontsize=60)
 
 
 class Tlo_Podloze(Actor):
@@ -84,17 +85,28 @@ class Tlo_Podloze(Actor):
 
 class Plansza():
     def __init__(self):
-        self.zycia = Poziom_zycia()
+        self.poziom_zycia = Poziom_zycia()
         self.gracz = Gracz()
         self.przeszkody = Przeszkody()
         self.tlo_podloze = Tlo_Podloze()
         self.napisy = Napisy()
-        self.stan_gry=1
+        self.punkty=0
+        self.stan_gry=0
+
+    def detektor_kolizji():
+        pass
 
     def draw(self):
         self.tlo_podloze.draw()
-        self.zycia.draw()
+        self.poziom_zycia.draw()
         self.gracz.draw()
+
+        if self.stan_gry==0:
+            self.napisy.draw(self.napisy.start)
+
+        if self.poziom_zycia.ilosc_zyc==0:
+            self.stan_gry="q"
+            self.napisy.draw(self.napisy.koniec)
 
     def update(self):
         if self.stan_gry==0:
