@@ -69,13 +69,17 @@ class Napisy():
 
 
 class Tlo_Podloze(Actor):
-    def __init__(self, x_podloze, y_podloze):
-        # super
-        grafika_podloze = ""
-        grafika_tlo = ""
+    def __init__(self):
+        self.x_podloze=0
+        self.y_podloze=0
+        self.grafika_podloze = "castle"
+        self.grafika_tlo = "#ebe591"
 
     def draw(self):
-        pass
+        screen.fill(self.grafika_tlo)
+
+        for i in range((screen.width // 70) + 1):
+            screen.blit(self.grafika_podloze, (i * 70, screen.height - 70))
 
 
 class Plansza():
@@ -83,11 +87,12 @@ class Plansza():
         self.zycia = Poziom_zycia()
         self.gracz = Gracz()
         self.przeszkody = Przeszkody()
-        self.tlo_podloze = Tlo_Podloze(0, 0)
+        self.tlo_podloze = Tlo_Podloze()
         self.napisy = Napisy()
         self.stan_gry=1
 
     def draw(self):
+        self.tlo_podloze.draw()
         self.zycia.draw()
         self.gracz.draw()
 
