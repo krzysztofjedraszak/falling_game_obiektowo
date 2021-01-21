@@ -94,8 +94,30 @@ class Plansza():
         self.punkty=0
         self.stan_gry=0
 
-    def detektor_kolizji():
-        pass
+    def detektor_kolizji(self):
+
+        for i in self.przeszkody.fireball.fireballs:
+            if self.gracz.colliderect(i):
+                if self.poziom_zycia.ilosc_zyc >= 1:
+                    self.poziom_zycia.zmniejsz()
+                    i.x = random.randint(0, 800)
+                    i.y = random.randint(self.przeszkody.fireball.y_min, self.przeszkody.fireball.y_max)
+
+        for i in self.przeszkody.anvil.anvils:
+            if self.gracz.colliderect(i):
+                if self.poziom_zycia.ilosc_zyc >= 1:
+                    self.poziom_zycia.zmniejsz()
+                    i.x = random.randint(0, 800)
+                    i.y = random.randint(self.przeszkody.anvil.y_min, self.przeszkody.anvil.y_max)
+
+
+        for i in self.przeszkody.star.stars:
+            if self.gracz.colliderect(i):
+                if self.poziom_zycia.ilosc_zyc >= 1:
+                    self.poziom_zycia.zmniejsz()
+                    i.x = random.randint(0, 800)
+                    i.y = random.randint(self.przeszkody.star.y_min, self.przeszkody.star.y_max)
+
 
     def draw(self):
         self.tlo_podloze.draw()
@@ -139,6 +161,7 @@ class Plansza():
                 self.gracz.right = 0
 
             self.przeszkody.update()
+            self.detektor_kolizji()
 
 class Fireball(Actor):
     def __init__(self):
