@@ -1,18 +1,19 @@
+import random
+
 import pgzrun
 from pgzero.actor import Actor
-import random
 
 
 class Poziom_zycia(Actor):
     def __init__(self):
-        self.first=30
-        self.second=30
+        self.first = 30
+        self.second = 30
         self.zycia = []
         self.ilosc_zyc = 3
         self.blokada = False
 
         for i in range(self.ilosc_zyc):
-            self.zycia.append(Actor("heart",(self.first+i*53,self.second)))
+            self.zycia.append(Actor("heart", (self.first + i * 53, self.second)))
 
     def zdejmij_blokade(self):
         self.blokada = False
@@ -34,9 +35,9 @@ class Poziom_zycia(Actor):
 
 class Gracz(Actor):
     def __init__(self):
-        self.first=400
-        self.second=484
-        super(Gracz, self).__init__("p1_stand",(self.first,self.second))
+        self.first = 400
+        self.second = 484
+        super(Gracz, self).__init__("p1_stand", (self.first, self.second))
         self.klatka = 0
         self.szybkosc = 6
         self.punkty = 0
@@ -65,15 +66,18 @@ class Napisy():
         self.start = "Wcisnij ENTER aby rozpoczac gre"
         self.koniec = "Przegrales :( Koniec Gry\nWcisnij ENTER aby zagrac jeszcze raz"
 
-    def draw(self,arg):
+    def draw(self, arg):
         screen.draw.text(arg, center=(screen.width / 2, screen.height / 2),
                          color="orange", fontsize=60)
+
+    def wyswietl_punkty(self, arg):
+        screen.draw.text(f"Punkty: {arg}", center=(650, 28), color="orange", fontsize=60)
 
 
 class Tlo_Podloze(Actor):
     def __init__(self):
-        self.x_podloze=0
-        self.y_podloze=0
+        self.x_podloze = 0
+        self.y_podloze = 0
         self.grafika_podloze = "castle"
         self.grafika_tlo = "#ebe591"
 
@@ -91,8 +95,8 @@ class Plansza():
         self.przeszkody = Przeszkody()
         self.tlo_podloze = Tlo_Podloze()
         self.napisy = Napisy()
-        self.punkty=0
-        self.stan_gry=0
+        self.punkty = 0
+        self.stan_gry = 0
 
     def detektor_kolizji(self):
 
@@ -102,6 +106,7 @@ class Plansza():
                     self.poziom_zycia.zmniejsz()
                     i.x = random.randint(0, 800)
                     i.y = random.randint(self.przeszkody.fireball.y_min, self.przeszkody.fireball.y_max)
+                    self.punkty -= 5
 
         for i in self.przeszkody.anvil.anvils:
             if self.gracz.colliderect(i):
@@ -110,14 +115,32 @@ class Plansza():
                     i.x = random.randint(0, 800)
                     i.y = random.randint(self.przeszkody.anvil.y_min, self.przeszkody.anvil.y_max)
 
-
         for i in self.przeszkody.star.stars:
             if self.gracz.colliderect(i):
                 if self.poziom_zycia.ilosc_zyc >= 1:
-                    self.poziom_zycia.zmniejsz()
                     i.x = random.randint(0, 800)
                     i.y = random.randint(self.przeszkody.star.y_min, self.przeszkody.star.y_max)
+                    self.punkty += 10
 
+    def reset(self):
+        self.poziom_zycia.ilosc_zyc = 3
+        self.punkty = 0
+        self.gracz.klatka = 0
+        self.stan_gry = 0
+
+        self.poziom_zycia = Poziom_zycia()
+
+        for i in self.przeszkody.fireball.fireballs:
+            i.y = random.randint(self.przeszkody.fireball.y_min, self.przeszkody.fireball.y_max)
+            i.x = random.randint(0, 800)
+
+        for i in self.przeszkody.anvil.anvils:
+            i.y = random.randint(self.przeszkody.anvil.y_min, self.przeszkody.anvil.y_max)
+            i.x = random.randint(0, 800)
+
+        for i in self.przeszkody.star.stars:
+            i.y = random.randint(self.przeszkody.star.y_min, self.przeszkody.star.y_max)
+            i.x = random.randint(0, 800)
 
     def draw(self):
         self.tlo_podloze.draw()
@@ -125,20 +148,23 @@ class Plansza():
         self.gracz.draw()
         self.przeszkody.draw()
 
-        if self.stan_gry==0:
+        self.napisy.wyswietl_punkty(self.punkty)
+
+        if self.stan_gry == 0:
             self.napisy.draw(self.napisy.start)
 
-        if self.poziom_zycia.ilosc_zyc==0:
-            self.stan_gry="q"
+        if self.poziom_zycia.ilosc_zyc == 0:
+            self.stan_gry = "q"
             self.napisy.draw(self.napisy.koniec)
+            if keyboard.RETURN:
+                self.reset()
 
     def update(self):
         if keyboard.RETURN:
-            if self.stan_gry==0:
-                self.stan_gry=1
+            if self.stan_gry == 0:
+                self.stan_gry = 1
 
-
-        if self.stan_gry==1:
+        if self.stan_gry == 1:
             if keyboard.right or keyboard.left:
                 if keyboard.RIGHT:
                     self.gracz.left += self.gracz.szybkosc
@@ -163,6 +189,7 @@ class Plansza():
             self.przeszkody.update()
             self.detektor_kolizji()
 
+
 class Fireball(Actor):
     def __init__(self):
         self.y_min = -2100
@@ -171,7 +198,7 @@ class Fireball(Actor):
         self.pred_spadania = 8
 
         for i in range(12):
-            self.fireballs.append(Actor("fireball",(random.randint(0, 800), random.randint(self.y_min, self.y_max))))
+            self.fireballs.append(Actor("fireball", (random.randint(0, 800), random.randint(self.y_min, self.y_max))))
 
     def draw(self):
         for i in self.fireballs:
@@ -184,6 +211,7 @@ class Fireball(Actor):
                 i.y = random.randint(self.y_min, self.y_max)
                 i.x = random.randint(0, 800)
 
+
 class Anvil(Actor):
     def __init__(self):
         self.y_min = -2100
@@ -192,7 +220,7 @@ class Anvil(Actor):
         self.pred_spadania = 6
 
         for i in range(12):
-            self.anvils.append(Actor("anvil",(random.randint(0, 800), random.randint(self.y_min, self.y_max))))
+            self.anvils.append(Actor("anvil", (random.randint(0, 800), random.randint(self.y_min, self.y_max))))
 
     def draw(self):
         for i in self.anvils:
@@ -214,7 +242,7 @@ class Star(Actor):
         self.pred_spadania = 5
 
         for i in range(12):
-            self.stars.append(Actor("star",(random.randint(0, 800), random.randint(self.y_min, self.y_max))))
+            self.stars.append(Actor("star", (random.randint(0, 800), random.randint(self.y_min, self.y_max))))
 
     def draw(self):
         for i in self.stars:
@@ -226,6 +254,7 @@ class Star(Actor):
             if i.y >= 600:
                 i.y = random.randint(self.y_min, self.y_max)
                 i.x = random.randint(0, 800)
+
 
 class Przeszkody():
     def __init__(self):
@@ -246,9 +275,11 @@ class Przeszkody():
 
 gra = Plansza()
 
+
 def draw():
     screen.clear()
     gra.draw()
+
 
 def update():
     gra.update()
