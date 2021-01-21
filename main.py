@@ -109,8 +109,9 @@ class Plansza():
             self.napisy.draw(self.napisy.koniec)
 
     def update(self):
-        if self.stan_gry==0:
-            pass
+        if keyboard.RETURN:
+            if self.stan_gry==0:
+                self.stan_gry=1
 
 
         if self.stan_gry==1:
@@ -129,6 +130,11 @@ class Plansza():
 
                 self.gracz.update()
 
+            if self.gracz.right < 0:
+                self.gracz.left = screen.width
+
+            if self.gracz.left > screen.width:
+                self.gracz.right = 0
 
 class Fireball(Actor):
     def __init__(self):
